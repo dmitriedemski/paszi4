@@ -52,6 +52,8 @@ app.add_middleware(
 # Подключаем маршруты
 app.include_router(auth.router)
 
+# NOTE: Starlette's CORSMiddleware handles OPTIONS (preflight) requests.
+# The custom OPTIONS handler was removed to avoid conflicts with CORSMiddleware.
 
 @app.get("/")
 async def root():

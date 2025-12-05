@@ -40,18 +40,20 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
-
-    @classmethod
-    def parse_cors_origins(cls, v):
-        """Парсинг CORS origins из строки или списка"""
-        if isinstance(v, str):
-            # Пробуем распарсить как JSON
-            try:
-                return json.loads(v.replace("'", '"'))
-            except json.JSONDecodeError:
-                # Если не JSON, разбиваем по запятой
-                return [origin.strip() for origin in v.split(",")]
-        return v
+        
+        @classmethod
+        def parse_env_var(cls, field_name: str, raw_val: str):
+            if field_name == "cors_origins":
+                # Если строка начинается с [ и заканчивается ], это JSON
+                if raw_val.startswith("[") and raw_val.endswith("]"):
+                    try:
+                        return json.loads(raw_val)
+                    except json.JSONDecodeError:
+                        # Если не получилось распарсить JSON, разбиваем по запятой
+                        pass
+                # Разбиваем по запятой
+                return [origin.strip() for origin in raw_val.split(",")]
+            return raw_val
 
 
 settings = Settings()
