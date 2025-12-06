@@ -27,9 +27,15 @@ logger.add(
     level="INFO" if settings.app_env == "production" else "DEBUG"
 )
 
-# Создаем таблицы в базе данных (в продакшене используем миграции)
+# Попытка автоматически создать таблицы в режиме разработки.
+# Однако при выполнении тестов импорт модуля не должен требовать доступ
+# к внешней БД (например, хост "db" может быть недоступен во время pytest).
+# Поэтому оборачиваем create_all в try/except и пропускаем ошибку подключения.
 if settings.app_env == "development":
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as exc:  # pragma: no cover - защита от недоступности БД при импорте
+        logger.warning(f"Skipping automatic Base.metadata.create_all(): {exc}")
 
 # Создаем приложение FastAPI
 app = FastAPI(

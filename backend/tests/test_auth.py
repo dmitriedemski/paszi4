@@ -1,6 +1,10 @@
 """
 Тесты для функционала регистрации пользователей
 """
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -147,7 +151,7 @@ class TestUserRegistration:
             
             # Должна вернуться ошибка валидации (422)
             assert response.status_code == 422
-            assert "Пароль должен" in response.json()["detail"]
+            assert "Пароль должен" in response.json()["detail"][0]["msg"]
     
     def test_invalid_login(self):
         """Тест регистрации с невалидным логином"""

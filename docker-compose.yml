@@ -32,7 +32,8 @@ services:
       - db
     networks:
       - app-network
-    # Уберите command и используйте entrypoint
+    command: >
+        sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000"
 
   # Frontend (React)
   frontend:
@@ -41,7 +42,7 @@ services:
       dockerfile: Dockerfile
     container_name: registration_frontend
     ports:
-      - "3000:80"  # Изменили с 3000:3000 на 3000:80
+      - "3000:80"
     depends_on:
       - backend
     networks:
